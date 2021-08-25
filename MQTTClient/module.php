@@ -73,18 +73,22 @@ class MQTTClient extends IPSModule
         $this->RegisterMessage(0, IPS_BASE);
         $this->RegisterMessage(0, IPS_KERNELSTARTED);
         $this->RegisterMessage(0, OM_CHANGEPARENT);
-        $cID = $this->GetConnectionID();
-        if ($cID != 0) {
-            $this->RegisterMessage($cID, IM_CHANGESTATUS);
-            if (IPS_GetProperty($cID, 'Host') != null && IPS_GetProperty($cID, 'Port') != 0) {
-                set_error_handler([$this, 'onConnectError']);
-                if (IPS_SetProperty($cID, 'Open', true)) {
-                    IPS_ApplyChanges($cID);
-                }
-                restore_error_handler();
-            }
-        }
-		$this->SetStatus(IS_ACTIVE);
+
+        // Workaround to avoid "InstanceInterface not available" error message during IPS start...
+        if (KR_READY != IPS_GetKernelRunlevel()) {
+		$cID = $this->GetConnectionID();
+		if ($cID != 0) {
+		    $this->RegisterMessage($cID, IM_CHANGESTATUS);
+		    if (IPS_GetProperty($cID, 'Host') != null && IPS_GetProperty($cID, 'Port') != 0) {
+			set_error_handler([$this, 'onConnectError']);
+			if (IPS_SetProperty($cID, 'Open', true)) {
+			    IPS_ApplyChanges($cID);
+			}
+			restore_error_handler();
+		    }
+		}
+	}
+	$this->SetStatus(IS_ACTIVE);
     }
 
     public function MessageSink($TimeStamp, $SenderID, $Message, $Data)
