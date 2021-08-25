@@ -173,10 +173,10 @@ class MQTTClient extends IPSModule
         $cID = $this->GetConnectionID();
         if (($this->HasActiveParent() || $force) && $cID > 0) {
             set_error_handler([$this, 'onConnectError']);
-            if (IPS_SetProperty($cID, 'Open', true)) {
+/*            if (IPS_SetProperty($cID, 'Open', true)) {
                 IPS_ApplyChanges($cID);
             }
-            restore_error_handler();
+*/            restore_error_handler();
         }
     }
 
